@@ -84,6 +84,12 @@ function MagneticButton({ children, onClick, href, strength = 0.35 }) {
 /* ---------------- Photo placeholder ---------------- */
 function Photo({ work, ratio, idx }) {
   const r = ratio ?? work?.ratio ?? 1;
+  const src = work?.src;
+  if (src) {
+    return (
+      <img src={src} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', aspectRatio: `1 / ${r}` }} alt={work?.label ?? ''} />
+    );
+  }
   const c = work?.color ?? ((idx ?? 0) % 10 + 1);
   return (
     <div className={`ph p-${c}`} style={{ aspectRatio: `1 / ${r}` }}>
