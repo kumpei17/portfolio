@@ -20,7 +20,7 @@ function JournalIndex({ navigate }) {
           <a key={j.id} className="jcard" href={'#entry/' + j.id}
              onClick={(e) => { e.preventDefault(); navigate('entry', j.id); }}>
             <div className="jcard-frame">
-              <Photo work={{ color: j.cover.color, ratio: 1.25 }} idx={i} />
+              <Photo work={j.cover} idx={i} />
               <span className="jcard-idx">{String(i + 1).padStart(2, '0')}</span>
               <span className="jcard-count">{j.photos.length} photos</span>
             </div>
@@ -129,7 +129,7 @@ function PhotoGrid({ photos, onOpen }) {
         const cls = 'pg-item' + (wide ? ' wide' : '') + (tall ? ' tall' : '');
         return (
           <button key={i} className={cls} onClick={() => onOpen(i)}>
-            <Photo work={{ color: p.color, ratio: p.ratio }} idx={i} />
+            <Photo work={p} idx={i} />
             <span className="pg-num">{String(i + 1).padStart(2, '0')}</span>
             <span className="pg-label">{p.label}</span>
           </button>
@@ -146,7 +146,7 @@ function Lightbox({ photos, index, onClose, onPrev, onNext, entry }) {
     <div className="lightbox" onClick={onClose}>
       <div className="lb-inner" onClick={(e) => e.stopPropagation()}>
         <div className="lb-frame">
-          <Photo work={{ color: p.color, ratio: p.ratio }} idx={index} />
+          <Photo work={p} idx={index} />
         </div>
         <div className="lb-bar">
           <div className="lb-bar-l">
@@ -188,7 +188,7 @@ function HomePage({ navigate }) {
             <a key={j.id} className="jcard" href={'#entry/' + j.id}
                onClick={(e) => { e.preventDefault(); navigate('entry', j.id); }}>
               <div className="jcard-frame">
-                <Photo work={{ color: j.cover.color, ratio: 1.25 }} idx={i} />
+                <Photo work={j.cover} idx={i} />
                 <span className="jcard-idx">{String(i + 1).padStart(2, '0')}</span>
                 <span className="jcard-count">{j.photos.length} photos</span>
               </div>
