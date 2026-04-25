@@ -3,9 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <title>Kumpei</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
@@ -22,7 +19,8 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
 }
-a { color: inherit; text-decoration: none; cursor: pointer; }
+a { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.2s linear; }
+a:hover { color: #aaa; }
 
 /* ============================================
    NAV
@@ -37,41 +35,36 @@ header {
   justify-content: space-between;
   padding: 0 28px;
   z-index: 200;
+  transition: opacity 0.495s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
-.site-name {
-  font-size: 14px;
-  font-style: normal;
-  letter-spacing: 0.01em;
-}
-.site-name a:hover { opacity: 0.5; }
+.site-name { font-size: 14px; letter-spacing: 0.01em; }
 
-nav ul {
-  display: flex;
-  list-style: none;
-  gap: 28px;
-}
-nav ul li a {
-  font-size: 14px;
-  color: #000;
-}
-nav ul li a:hover { opacity: 0.5; }
+nav ul { display: flex; list-style: none; gap: 28px; }
+nav ul li a { font-size: 14px; color: #000; }
 
 /* ============================================
-   VIEWS
+   VIEWS — フェードトランジション
    ============================================ */
-.view { display: none; }
-.view.active { display: block; }
+.view {
+  display: block;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  transition: opacity 0.33s;
+}
+.view.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+}
 
 /* ============================================
    WORK LIST
    ============================================ */
-#view-list {
-  padding-top: 52px;
-}
+#view-list { padding-top: 52px; }
 
-.work-list-inner {
-  padding: 48px 28px 80px;
-}
+.work-list-inner { padding: 48px 28px 80px; }
 
 .work-list-title {
   font-size: 14px;
@@ -85,8 +78,28 @@ nav ul li a:hover { opacity: 0.5; }
   gap: 48px 32px;
 }
 
+/* ---- Work item + hover animation (ittetsumatsuoka方式) ---- */
 .work-item {
   cursor: pointer;
+  position: relative;
+}
+
+/* hover背景 — scale(0.9)→scale(1) + subtle bg */
+.work-item::before {
+  content: "";
+  position: absolute;
+  top: 50%; left: 0;
+  width: 100%; height: 100%;
+  border-radius: 4px;
+  background-color: rgba(33, 33, 36, 0);
+  transform: translateY(-50%) scale(0.9);
+  transition: background-color 0.3s linear, transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+.work-item:hover::before {
+  background-color: rgba(33, 33, 36, 0.04);
+  transform: translateY(-50%) scale(1);
 }
 
 .work-thumb {
@@ -95,15 +108,20 @@ nav ul li a:hover { opacity: 0.5; }
   overflow: hidden;
   background: #f0f0f0;
   margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
 }
 .work-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: opacity 0.3s;
+  transition: opacity 0.3s linear, transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
 }
-.work-item:hover .work-thumb img { opacity: 0.75; }
+.work-item:hover .work-thumb img {
+  opacity: 0.85;
+  transform: scale(1.02);
+}
 
 .thumb-placeholder {
   width: 100%;
@@ -122,18 +140,34 @@ nav ul li a:hover { opacity: 0.5; }
   color: #888;
   line-height: 1.4;
   margin-bottom: 2px;
+  position: relative; z-index: 1;
+  transition: opacity 0.2s linear;
 }
 .work-title {
   font-size: 14px;
   line-height: 1.5;
+  position: relative; z-index: 1;
+  transition: opacity 0.2s linear;
+}
+
+/* スクロールフェードイン */
+.work-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+/* hover::before は別で上書きしているので work-item の transform を分けて管理 */
+.work-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ============================================
    WORK DETAIL
    ============================================ */
-#view-detail {
-  padding-top: 52px;
-}
+#view-detail { padding-top: 52px; }
 
 .detail-inner {
   padding: 40px 28px 100px;
@@ -148,30 +182,28 @@ nav ul li a:hover { opacity: 0.5; }
   color: #000;
   margin-bottom: 48px;
   cursor: pointer;
+  transition: opacity 0.2s linear;
 }
 .back-btn:hover { opacity: 0.5; }
 .back-arrow { font-size: 16px; line-height: 1; }
 
-.detail-label {
-  font-size: 13px;
-  color: #888;
-  margin-bottom: 2px;
-}
-.detail-title {
-  font-size: 18px;
-  font-weight: 400;
-  line-height: 1.4;
-  margin-bottom: 48px;
-}
+.detail-label { font-size: 13px; color: #888; margin-bottom: 2px; }
+.detail-title { font-size: 18px; font-weight: 400; line-height: 1.4; margin-bottom: 48px; }
 
-.detail-images {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.detail-images { display: flex; flex-direction: column; gap: 6px; }
+
+/* 詳細ページの各画像フェードイン */
 .detail-img-wrap {
   width: 100%;
   background: #f0f0f0;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.detail-img-wrap.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 .detail-img-wrap img {
   width: 100%;
@@ -194,12 +226,7 @@ nav ul li a:hover { opacity: 0.5; }
 .detail-img-placeholder.r-2-3  { aspect-ratio: 2/3; }
 .detail-img-placeholder.r-3-4  { aspect-ratio: 3/4; }
 
-.detail-caption {
-  margin-top: 28px;
-  font-size: 13px;
-  color: #888;
-  line-height: 1.7;
-}
+.detail-caption { margin-top: 28px; font-size: 13px; color: #888; line-height: 1.7; }
 
 .detail-next {
   display: block;
@@ -207,6 +234,7 @@ nav ul li a:hover { opacity: 0.5; }
   font-size: 13px;
   color: #888;
   cursor: pointer;
+  transition: color 0.2s linear;
 }
 .detail-next:hover { color: #000; }
 .detail-next-label { font-size: 11px; margin-bottom: 2px; }
@@ -221,6 +249,7 @@ nav ul li a:hover { opacity: 0.5; }
   .work-grid { grid-template-columns: 1fr; gap: 40px; }
   .detail-inner { padding: 32px 18px 80px; }
   nav ul { gap: 18px; }
+  .work-item::before { display: none; }
 }
 </style>
 </head>
@@ -228,10 +257,10 @@ nav ul li a:hover { opacity: 0.5; }
 
 <!-- ============ HEADER ============ -->
 <header>
-  <div class="site-name"><a onclick="showList()">Kumpei</a></div>
+  <div class="site-name"><a onclick="showList(); return false;">Kumpei</a></div>
   <nav>
     <ul>
-      <li><a onclick="showList()">Journal</a></li>
+      <li><a onclick="showList(); return false;">Journal</a></li>
       <li><a href="https://www.instagram.com/k.umpei/" target="_blank">Instagram</a></li>
     </ul>
   </nav>
@@ -302,14 +331,70 @@ const works = [
 ];
 
 let currentId = 0;
+let observer = null;
+
+/* ---- IntersectionObserver でスクロールフェードイン ---- */
+function observeItems(selector) {
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // 少しずつ遅延させてずらす
+        setTimeout(() => {
+          entry.target.classList.add('is-visible');
+        }, i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll(selector).forEach(el => observer.observe(el));
+}
+
+/* ---- ページ遷移フェード ---- */
+function transitionTo(showId, hideId, callback) {
+  const hideEl = document.getElementById(hideId);
+  const showEl = document.getElementById(showId);
+
+  // フェードアウト
+  hideEl.style.transition = 'opacity 0.33s';
+  hideEl.style.opacity = '0';
+  hideEl.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    hideEl.classList.remove('active');
+    hideEl.style.opacity = '';
+    hideEl.style.transition = '';
+
+    window.scrollTo(0, 0);
+
+    if (callback) callback();
+
+    showEl.classList.add('active');
+    // フェードイン
+    showEl.style.opacity = '0';
+    showEl.style.transition = 'none';
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        showEl.style.transition = 'opacity 0.33s';
+        showEl.style.opacity = '1';
+        setTimeout(() => {
+          showEl.style.opacity = '';
+          showEl.style.transition = '';
+        }, 350);
+      });
+    });
+  }, 330);
+}
 
 /* ---- グリッド構築 ---- */
 function buildGrid() {
   const grid = document.getElementById('work-grid');
   grid.innerHTML = '';
-  works.forEach(w => {
+  works.forEach((w, idx) => {
     const item = document.createElement('div');
     item.className = 'work-item';
+    item.style.transitionDelay = `${idx * 80}ms`;
     item.onclick = () => showDetail(w.id);
 
     const thumbHtml = w.thumb
@@ -323,6 +408,9 @@ function buildGrid() {
     `;
     grid.appendChild(item);
   });
+
+  // 少し待ってからフェードイン開始
+  setTimeout(() => observeItems('.work-item'), 50);
 }
 
 /* ---- 詳細ページ表示 ---- */
@@ -330,42 +418,90 @@ function showDetail(id) {
   currentId = id;
   const w = works[id];
 
-  document.getElementById('detail-label').textContent = w.label;
-  document.getElementById('detail-title').textContent = w.title;
-  document.getElementById('detail-caption').innerHTML = w.caption.replace(/\n/g,'<br>');
+  const populate = () => {
+    document.getElementById('detail-label').textContent = w.label;
+    document.getElementById('detail-title').textContent = w.title;
+    document.getElementById('detail-caption').innerHTML = w.caption.replace(/\n/g,'<br>');
 
-  const container = document.getElementById('detail-images');
-  container.innerHTML = '';
-  w.images.forEach((src, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'detail-img-wrap';
-    if (src) {
-      wrap.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
-    } else {
-      const ratio = w.ratios[i] || 'r-4-3';
-      wrap.innerHTML = `<div class="detail-img-placeholder ${ratio}">Photo ${i+1}</div>`;
-    }
-    container.appendChild(wrap);
-  });
+    const container = document.getElementById('detail-images');
+    container.innerHTML = '';
+    w.images.forEach((src, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'detail-img-wrap';
+      if (src) {
+        wrap.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
+      } else {
+        const ratio = w.ratios[i] || 'r-4-3';
+        wrap.innerHTML = `<div class="detail-img-placeholder ${ratio}">Photo ${i+1}</div>`;
+      }
+      container.appendChild(wrap);
+    });
 
-  const nextWork = works[(id + 1) % works.length];
-  document.getElementById('next-title').textContent = nextWork.title;
+    const nextWork = works[(id + 1) % works.length];
+    document.getElementById('next-title').textContent = nextWork.title;
 
-  document.getElementById('view-list').classList.remove('active');
-  document.getElementById('view-detail').classList.add('active');
-  window.scrollTo(0, 0);
+    // 詳細画像のスクロールフェードイン
+    setTimeout(() => observeItems('.detail-img-wrap'), 50);
+  };
+
+  transitionTo('view-detail', 'view-list', populate);
 }
 
 /* ---- 次の作品 ---- */
 function goNext() {
-  showDetail((currentId + 1) % works.length);
+  const nextId = (currentId + 1) % works.length;
+  currentId = nextId;
+  const w = works[nextId];
+
+  const populate = () => {
+    document.getElementById('detail-label').textContent = w.label;
+    document.getElementById('detail-title').textContent = w.title;
+    document.getElementById('detail-caption').innerHTML = w.caption.replace(/\n/g,'<br>');
+
+    const container = document.getElementById('detail-images');
+    container.innerHTML = '';
+    w.images.forEach((src, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'detail-img-wrap';
+      if (src) {
+        wrap.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
+      } else {
+        const ratio = w.ratios[i] || 'r-4-3';
+        wrap.innerHTML = `<div class="detail-img-placeholder ${ratio}">Photo ${i+1}</div>`;
+      }
+      container.appendChild(wrap);
+    });
+
+    const nextWork = works[(nextId + 1) % works.length];
+    document.getElementById('next-title').textContent = nextWork.title;
+
+    setTimeout(() => observeItems('.detail-img-wrap'), 50);
+  };
+
+  // 同じビュー内でフェード
+  const detail = document.getElementById('view-detail');
+  detail.style.transition = 'opacity 0.33s';
+  detail.style.opacity = '0';
+  setTimeout(() => {
+    populate();
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        detail.style.opacity = '1';
+        setTimeout(() => {
+          detail.style.opacity = '';
+          detail.style.transition = '';
+        }, 350);
+      });
+    });
+  }, 330);
 }
 
 /* ---- 一覧に戻る ---- */
 function showList() {
-  document.getElementById('view-detail').classList.remove('active');
-  document.getElementById('view-list').classList.add('active');
-  window.scrollTo(0, 0);
+  transitionTo('view-list', 'view-detail', () => {
+    setTimeout(() => observeItems('.work-item'), 50);
+  });
 }
 
 buildGrid();
